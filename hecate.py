@@ -9,8 +9,6 @@ from IPython.core.display import SVG
 PIECE_VALUES = {1: 1, 2: 3,
                 3: 3, 4: 5, 5: 8, 6: 0}
 NEUTRAL_EVAL = 0
-IS_TURN = True
-IS_NOT_TURN = True
 
 
 class Engine:
@@ -110,8 +108,8 @@ class Game:
 class Main:
     def main():
         board = chess.Board()
-        hectate = Engine(board)
-        newGame = Game(board, hectate)
+        hecate = Engine(board)
+        newGame = Game(board, hecate)
         newGame.play()
         return
 
