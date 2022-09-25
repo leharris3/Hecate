@@ -7,7 +7,6 @@ import chess.svg
 from IPython.core.display import SVG
 from chessboard import display
 
-
 PIECE_VALUES = {1: 1, 2: 3,
                 3: 3, 4: 5, 5: 8, 6: 0}
 NEUTRAL_EVAL = 0
@@ -79,13 +78,16 @@ class Game:
         userColor = self.chooseColor()
         if userColor == "White":
             while not self.board.is_game_over():
-                self.makeUserMove()
+                while self.board.turn == chess.WHITE:
+                    self.makeUserMove()
                 self.makeEngineMove()
                 self.printGame()
         else:
             while not self.board.is_game_over():
                 self.makeEngineMove()
                 self.printGame()
+                while self.board.turn == chess.BLACK:
+                    self.makeUserMove()
                 self.makeUserMove()
         print("Game Over!")
 
@@ -99,14 +101,18 @@ class Game:
     def makeUserMove(self):
         legalMoves = list(self.board.legal_moves)
         try:
-            userMove = chess.Move.from_uci(input("Human Turn: "))
+            userInput = input("Human Turn: ")
+            if userInput == "undo":
+                self.board.pop().pop()
+            if userInput == "stop":
+                quit()
+            userMove = chess.Move.from_uci(userInput)
+
             if userMove not in legalMoves:
                 print("Illegal Move!")
-                self.makeUserMove()
             self.board.push(userMove)
         except:
             print("Illegal Move!")
-            self.makeUserMove()
 
     def makeEngineMove(self):
         self.board.push(self.engine.move())
