@@ -1,4 +1,3 @@
-from cProfile import label
 import chess
 import random
 import os
@@ -88,7 +87,6 @@ class Game:
                 self.printGame()
                 while self.board.turn == chess.BLACK:
                     self.makeUserMove()
-                self.makeUserMove()
         print("Game Over!")
 
     def chooseColor(self):
