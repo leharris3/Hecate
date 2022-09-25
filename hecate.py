@@ -1,14 +1,17 @@
+from cProfile import label
 import chess
 import random
 import os
 import sys
 import chess.svg
 from IPython.core.display import SVG
+from chessboard import display
 
 
 PIECE_VALUES = {1: 1, 2: 3,
                 3: 3, 4: 5, 5: 8, 6: 0}
 NEUTRAL_EVAL = 0
+NEG_EVAL = -100
 
 
 class Engine:
@@ -22,13 +25,13 @@ class Engine:
 
     def evaluate(self):
         legalMoves = list(self.board.legal_moves)
-        bestEval = NEUTRAL_EVAL
-        canidateMoves = legalMoves
+        bestEval = NEG_EVAL
+        canidateMoves = []
 
         def evaluate_r(oppBoard: chess.Board, move: chess.Move):
             oppBoard.push(move)
             oppMoves = list(oppBoard.legal_moves)
-            bestOppEval = NEUTRAL_EVAL
+            bestOppEval = 0
 
             if oppBoard.is_checkmate():
                 return sys.maxsize
@@ -55,17 +58,16 @@ class Engine:
             clone = chess.Board(fin)
             clone.color = chess.BLACK
 
-            if move != None:
-                eval -= evaluate_r(clone, move)
-
+            eval -= evaluate_r(clone, move)
             if eval > bestEval:
                 canidateMoves = []
                 canidateMoves.append(move)
                 bestEval = eval
             elif eval == bestEval:
                 canidateMoves.append(move)
-
-            return random.choice(canidateMoves)
+        if len(canidateMoves) == 0:
+            return random.choice(legalMoves)
+        return random.choice(canidateMoves)
 
 
 class Game:
@@ -95,14 +97,23 @@ class Game:
         return userColor
 
     def makeUserMove(self):
-        self.board.push(chess.Move.from_uci(input("Human Turn: ")))
+        legalMoves = list(self.board.legal_moves)
+        try:
+            userMove = chess.Move.from_uci(input("Human Turn: "))
+            if userMove not in legalMoves:
+                print("Illegal Move!")
+                self.makeUserMove()
+            self.board.push(userMove)
+        except:
+            print("Illegal Move!")
+            self.makeUserMove()
 
     def makeEngineMove(self):
         self.board.push(self.engine.move())
 
     def printGame(self):
         os.system('cls||clear')
-        print(self.board)
+        display.start(self.board.fen())
 
 
 class Main:
